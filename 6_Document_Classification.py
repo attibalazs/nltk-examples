@@ -1,42 +1,30 @@
 import nltk
 import random
+from nltk.corpus import movie_reviews
 
-def gender_features(word):
-    return {'suffix1': word[-1:], 'suffix2': word[-2:], 'suffix2': word[-3:]}
+all_words = nltk.FreqDist(w.lower() for w in movie_reviews.words())
+word_features = all_words.keys()[:2000]
+
+def document_features(document):
+
+    document_words = set(document)
+    features = {}
+    for word in word_features:
+        features['contains(%s)' % word] = (word in document_words)
+    return features
 
 def main():
-    from nltk.corpus import names
-    names = ([(name, 'male') for name in names.words('male.txt')] +
-        [(name, 'female') for name in names.words('female.txt')])
-    random.shuffle(names)
-    train_names = names[1500:]
-    devtest_names = names[500:1500]
-    test_names = names[:500]
-
-    train_set = [(gender_features(n), g) for (n,g) in train_names]
-    devtest_set = [(gender_features(n), g) for (n,g) in devtest_names]
-
+    documents = [(list(movie_reviews.words(fileid)), category)
+                for category in movie_reviews.categories()
+                for fileid in movie_reviews.fileids(category)]
+    random.shuffle(documents)
+    print documents[1]
+    featuresets = [(document_features(d), c) for (d,c) in documents]
+    train_set, test_set = featuresets[100:], featuresets[:100]
     classifier = nltk.NaiveBayesClassifier.train(train_set)
 
-    print classifier.classify(gender_features('Neo'))
-    print classifier.classify(gender_features('Trinity'))
-    print 'attila:', classifier.classify(gender_features('Attila'))
-    print classifier.classify(gender_features('Bori'))
-    print classifier.classify(gender_features('Gabi'))
-    print 'andy:', classifier.classify(gender_features('Andy'))
-    print 'dom:', classifier.classify(gender_features('Dom'))
-    print 'monica:', classifier.classify(gender_features('Monica'))
-
-    print "accuracy:", nltk.classify.accuracy(classifier, devtest_set)
+    print nltk.classify.accuracy(classifier, test_set)
     print classifier.show_most_informative_features(5)
-
-    errors = []
-    for (name, tag) in devtest_names:
-        guess = classifier.classify(gender_features(name))
-        if guess != tag:
-            errors.append((tag, guess, name))
-    for (tag, guess, name) in sorted(errors): # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
-        print 'correct=%-8s guess=%-8s name=%-30s' % (tag, guess, name)
 
 if __name__ == "__main__":
     main()

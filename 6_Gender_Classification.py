@@ -22,6 +22,7 @@ def main():
     print classifier.classify(gender_features('Trinity'))
     print 'attila:', classifier.classify(gender_features('Attila'))
     print classifier.classify(gender_features('Bori'))
+    print classifier.classify(gender_features('Gabi'))
     print 'andy:', classifier.classify(gender_features('Andy'))
     print 'dom:', classifier.classify(gender_features('Dom'))
     print 'monica:', classifier.classify(gender_features('Monica'))
