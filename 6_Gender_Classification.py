@@ -1,8 +1,10 @@
 import nltk
 import random
 
+
 def gender_features(word):
     return {'suffix1': word[-1:], 'suffix2': word[-2:], 'suffix2': word[-3:]}
+
 
 def main():
     from nltk.corpus import names
@@ -26,6 +28,7 @@ def main():
     print 'andy:', classifier.classify(gender_features('Andy'))
     print 'dom:', classifier.classify(gender_features('Dom'))
     print 'monica:', classifier.classify(gender_features('Monica'))
+    print 'donnie:', classifier.classify(gender_features('Donald'))
 
     print "accuracy:", nltk.classify.accuracy(classifier, devtest_set)
     print classifier.show_most_informative_features(5)
@@ -37,6 +40,7 @@ def main():
             errors.append((tag, guess, name))
     for (tag, guess, name) in sorted(errors): # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
         print 'correct=%-8s guess=%-8s name=%-30s' % (tag, guess, name)
+
 
 if __name__ == "__main__":
     main()

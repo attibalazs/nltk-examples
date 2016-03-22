@@ -1,25 +1,28 @@
+# coding=utf-8
 import nltk
+from nltk.corpus import rte
 
+"""Example 6-7. Recognizing Text Entailment feature extractor: The RTEFeatureExtractor class
+    builds a bag of words for both the text and the hypothesis after throwing away some stopwords, then
+    calculates overlap and difference."""
 
-def dialogue_act_features(post):
+def rte_features(rtepair):
+    extractor = nltk.RTEFeatureExtractor(rtepair)
     features = {}
-    for word in nltk.word_tokenize(post):
-        features['contains(%s)' % word.lower()] = True
-    return features
+    features['word_overlap'] = len(extractor.overlap('word'))
+    features['word_hyp_extra'] = len(extractor.hyp_extra('word'))
+    features['ne_overlap'] = len(extractor.overlap('ne'))
+    features['ne_hyp_extra'] = len(extractor.hyp_extra('ne'))
 
 def main():
+  # Doesn`t work, crashes with the following error: Resource u'corpora/rte' not found.
+  rtepair = nltk.corpus.rte.pairs(['rte3_dev.xml'])[33]
+  extractor = nltk.RTEFeatureExtractor(rtepair)
+  print extractor.text_words
+  print extractor.hyp.words
+  print extractor.overlap('word')
+  print extractor.overlap('ne')
+  print extractor.hyp_extra('ne')
 
-    posts = nltk.corpus.nps_chat.xml_posts()[:10000]
-
-    featuresets = [(dialogue_act_features(post.text), post.get('class'))
-                   for post in posts]
-
-    size = int(len(featuresets)*0.1)
-    print size
-    train_set, test_set = featuresets[size:], featuresets[:size]
-    classifier = nltk.NaiveBayesClassifier.train(train_set)
-    print nltk.classify.accuracy(classifier, test_set)
-    print classifier.classify(dialogue_act_features('hello everybody, how is it going ?'))
-    print classifier.classify(dialogue_act_features('i`ll be right back'))
 if __name__ == "__main__":
     main()

@@ -19,7 +19,8 @@ def main():
     train_set, test_set = featuresets[size:], featuresets[:size]
     classifier = nltk.NaiveBayesClassifier.train(train_set)
     print nltk.classify.accuracy(classifier, test_set)
-
-
+    print classifier.classify(dialogue_act_features('hello everybody, how is it going'))
+    print classifier.classify(dialogue_act_features('i`ll be right back'))
+    print classifier.classify(dialogue_act_features('awesome!!!!'))
 if __name__ == "__main__":
     main()
